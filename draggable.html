@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<head>
+<style>
+	.container {
+		width: 350px;
+		overflow-x: hidden;
+		display: flex;
+	}
+	.draggable {
+		display: flex;
+		-webkit-transition: .1s ease-in-out;
+		-moz-transition: .1s ease-in-out;
+		-o-transition: .1s ease-in-out;
+	}
+	.draggable img {
+		pointer-events: none;
+		flex-shrink: 0;
+	}
+</style>
+</head>
+<body>
+	<div class="container">
+		<div class="draggable" style="transform:translateX(0px);">
+			<img src="https://via.placeholder.com/350x150">
+			<img src="https://via.placeholder.com/350x150">
+			<img src="https://via.placeholder.com/350x150">
+			<img src="https://via.placeholder.com/350x150">
+		</div>
+	</div>
+</body>
+<script>
+var draggable = document.querySelector('.draggable');
+var doMove = false;
+var initialX = 0;
+var initialTranslateX = 0;
+
+var onDragStart = function(evt) {
+	doMove = true;
+	initialX = (evt.touches !== undefined) ? evt.touches[0].clientX : evt.pageX;
+	initialTranslateX = parseInt(draggable.style.transform.replace(/[^\d-]/g,''));
+};
+
+var onDragEnd = function() {
+	doMove = false;
+};
+
+var onDragMove = function(evt) {
+	var translateX = 0;
+	var newX = (evt.touches !== undefined) ? evt.touches[0].clientX : evt.pageX;
+	var evtType = evt.type;
+	newX = newX - initialX;
+	if (Math.abs(newX) > 50) {
+		draggable.removeEventListener(evtType, onDragMove);
+		if (newX < 0) {
+			draggable.style.transform = 'translateX(' + parseInt(initialTranslateX - 350) + 'px)';
+		} else if (newX > 0) {
+			draggable.style.transform = 'translateX(' + parseInt(initialTranslateX + 350) + 'px)';
+		}
+		setTimeout(function() {
+			draggable.addEventListener(evtType, onDragMove);
+		}, 300);
+	} else {
+		translateX = newX + initialTranslateX;
+		if (doMove) {
+			draggable.style.transform = 'translateX(' + translateX + 'px)';
+		}
+	}
+};
+
+draggable.addEventListener('mousedown', onDragStart);
+draggable.addEventListener('touchstart', onDragStart);
+
+document.addEventListener('mouseup', onDragEnd);
+document.addEventListener('touchend', onDragEnd);
+
+
+draggable.addEventListener('mousemove', onDragMove);
+draggable.addEventListener('touchmove', onDragMove);
+
+</script>
+</html>
